@@ -1,36 +1,4 @@
-import numpy as np
-import sys
-from multiprocessing import Process
 import cv2
-
-def get_threshold(image, x=26, y=64):
-    """
-    This is a method to compute the threshold of RGB images.
-    Threshold is defined as the RGB color in characters.
-    In order to simplify this task, we can use location (26,64)
-    as sampling point(if the number is in [0,1,2,3,5,6,7,8,9]).
-    If the character is "4", try to move up the sampling point. 
-    """
-    pixels = np.array([image[y-1,x-1],image[y-1,x],image[y-1,x+1],
-                       image[y,x-1],image[y,x],image[y,x+1],
-                       image[y+1,x-1],image[y+1,x],image[y+1,x+1]])
-    mean = np.sum(pixels,axis=0) // 9
-    # If average of mean is less than 160, that means the threshold is valid.
-    # Else the threshold is invalid, try to move up the sampling point.
-    if sum(mean)//3 < 160:
-        return mean
-    else:
-        return get_threshold(image, x, y-3)
-
-def RGB_clean(image):
-    """ Remove noisy points according to RGB thresholds. """
-    B,G,R = [int(i) for i in get_threshold(image)]
-    for x in range(image.shape[1]):
-        for y in range(image.shape[0]):
-            b,g,r = [int(i) for i in image[y,x]]
-            if abs(b-B)>30 or abs(g-G)>30 or abs(r-R)>30:
-                image[y,x] = (255,255,255)
-    return image
 
 def pixel_repair(image):
     """ Repair the holes in characters caused by removing noisy points. """
@@ -108,9 +76,3 @@ def remove_noise(image):
     # Repair the image.
     image = pixel_repair(image)
     return image
-
-def remove_batch(start,end):
-    """ Batch processing. """
-    for i in range(start,end):
-        remove_noise(i)
-        print("Dealing pictures:"+str(i)+"/"+level1.TEST_NUMBER)

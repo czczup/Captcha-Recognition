@@ -1,7 +1,7 @@
 import tensorflow as tf
-from model import captcha_cnn,X,Y,keep_prob
+from model import Model
 import conf
-from accuracy_calculate import accuracy_calculate
+
 def read_and_decode(filename):
     filename_queue = tf.train.string_input_producer([filename]) # create a queue
     reader = tf.TFRecordReader()
@@ -17,41 +17,24 @@ def read_and_decode(filename):
     label = tf.cast(features['label'],tf.int64) # throw label tensor
     return image, label
 
-def network():
-    output, parameters = captcha_cnn()
-    prediction = tf.nn.softmax(output) # 32
-    label = tf.one_hot(indices=tf.cast(Y, tf.int32), depth=32, name='y_onehot')
-    with tf.name_scope('correct_prediction'):
-        correct_prediction = tf.equal(tf.argmax(prediction, 1), tf.argmax(label, 1))
-    with tf.name_scope('loss'):
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=label))
-        tf.summary.scalar('loss', loss)
-    with tf.name_scope('AdamOptimizer'):
-        optimizer = tf.train.AdamOptimizer(0.0001).minimize(loss)
-    with tf.name_scope('accuracy'):
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        tf.summary.scalar('accuracy', accuracy)
-    merged = tf.summary.merge_all()
-    return loss, optimizer, accuracy, merged, parameters,output
-
 def load_dataset():
     # Load training set.
     with tf.name_scope('input_train'):
         image_train, label_train = read_and_decode("tfrecord/image_train.tfrecord")
         image_batch_train, label_batch_train = tf.train.shuffle_batch(
-            [image_train, label_train], batch_size=256, capacity=51200, min_after_dequeue=12800
+            [image_train, label_train], batch_size=256, capacity=12800, min_after_dequeue=5120
         )
     # Load validation set.
     with tf.name_scope('input_valid'):
         image_valid, label_valid = read_and_decode("tfrecord/image_valid.tfrecord")
         image_batch_valid, label_batch_valid = tf.train.shuffle_batch(
-            [image_valid, label_valid], batch_size=1024, capacity=4096, min_after_dequeue=2048
+            [image_valid, label_valid], batch_size=512, capacity=12800, min_after_dequeue=5120
         )
     return image_batch_train, label_batch_train, image_batch_valid, label_batch_valid
 
 def train():
     # Network
-    loss, optimizer, accuracy, merged, parameters,output = network()
+    model = Model()
     sess = tf.Session()
 
     # Recording training process.
@@ -62,13 +45,13 @@ def train():
     image_batch_train, label_batch_train, image_batch_valid, label_batch_valid = load_dataset()
 
     # General setting.
-    #saver = tf.train.Saver(parameters)
+    # saver = tf.train.Saver(model.parameters)
     saver = tf.train.Saver()
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
     sess.run(tf.global_variables_initializer())
     saver.restore(sess, conf.MODEL_PATH)
-    #saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=40)
 
     i = 0
     while 1:
@@ -76,24 +59,35 @@ def train():
         batch_x_train, batch_y_train = sess.run([image_batch_train, label_batch_train])
 
         # train
-        _, loss_ = sess.run([optimizer, loss], feed_dict={X: batch_x_train, Y: batch_y_train, keep_prob: 0.9})
-        print(i, 'loss:\t', loss_)
+        _, loss_value = sess.run([model.optimizer, model.loss],feed_dict={model.X: batch_x_train,
+                                                                          model.Y: batch_y_train,
+                                                                          model.keep_prob: 0.6})
+        print("step "+str(i)+",loss "+str(loss_value))
 
         if i%10 == 0:
             # Calculate the accuracy of training set.
-            acc_train,summary = sess.run([accuracy, merged],feed_dict={X: batch_x_train, Y: batch_y_train, keep_prob: 1.0})
+            acc_train, summary = sess.run([model.accuracy, model.merged],feed_dict={model.X: batch_x_train,
+                                                                                    model.Y: batch_y_train,
+                                                                                    model.keep_prob: 1.0})
             writer_train.add_summary(summary, i)
+
             # Get a batch of validation set.
             batch_x_valid, batch_y_valid = sess.run([image_batch_valid, label_batch_valid])
-            # Calculate the accuracy of validation set.
-            acc_valid, summary = sess.run([accuracy, merged],feed_dict={X: batch_x_valid, Y: batch_y_valid, keep_prob: 1.0})
-            writer_valid.add_summary(summary, i)
-            print("Lter "+str(i)+",Train Accuracy "+str(acc_train)+",Valid Accuracy "+str(acc_valid))
 
-        if i % 500 == 0:
+            # Calculate the accuracy of validation set.
+            acc_valid, summary = sess.run([model.accuracy, model.merged],feed_dict={model.X: batch_x_valid,
+                                                                                    model.Y: batch_y_valid,
+                                                                                    model.keep_prob: 1.0})
+            writer_valid.add_summary(summary, i)
+
+            print("step {},Train Accuracy {:.4f},Valid Accuracy {:.4f}".format(i, acc_train, acc_valid))
+
+        if i % 100 == 0:
             print("Save the model Successfully")
             saver.save(sess, "model/model_level2.ckpt", global_step=i)
+
         i += 1
+
     coord.request_stop()
     coord.join(threads)
 

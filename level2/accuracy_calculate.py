@@ -3,8 +3,8 @@ import conf
 
 def accuracy_calculate():
     # load mappings.txt
-    dict1 = read_CSV("mappings.txt")
-    dict2 = read_CSV("raw_mappings.txt")
+    dict1 = read_CSV(conf.MAPPINGS)
+    dict2 = read_CSV(conf.TEST_MAPPINGS)
 
     # Calculate the accuracy.
     correct = 0
@@ -13,6 +13,7 @@ def accuracy_calculate():
             correct += 1
         else:
             print("Number:",i,"False:",dict1[i],"True:",dict2[i])
+
     print("Accuracy:",correct / conf.TEST_NUMBER)
     return correct / conf.TEST_NUMBER
 
