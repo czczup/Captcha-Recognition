@@ -1,6 +1,6 @@
 import sys
 import tensorflow as tf
-from model import captcha_cnn,X,keep_prob
+from model import Model
 import numpy as np
 import cv2
 from PIL import Image
@@ -13,11 +13,9 @@ num2str = {
     25:"T",26:"U",27:"V",28:"W",29:"X",30:"Y"
 }
 
-def test(output,sess):
-    prediction  = tf.nn.softmax(output)
-    result = tf.argmax(prediction, 1)
-
-    f = open("mappings.txt", "w")
+def test(model,sess):
+    result = tf.argmax(model.prediction, 1)
+    f = open(conf.MAPPINGS, "w")
 
     for i in range(conf.TEST_NUMBER):
         # Open images.
@@ -26,7 +24,7 @@ def test(output,sess):
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
         # Cut the captcha into four characters.
-        cut_list = [image[:, 2:58], image[:, 49:105],image[:, 99:155], image[:, 142:198]]
+        cut_list = [image[:, 5:61], image[:, 52:108],image[:, 101:157], image[:, 144:200]]
 
         # Image preprocessing.
         for j in range(4):
@@ -37,7 +35,7 @@ def test(output,sess):
             cut_list[j] = image.reshape([28,40,1])
 
         # Get predictions.
-        nums = sess.run(result, feed_dict={X: cut_list, keep_prob: 1.0})
+        nums = sess.run(result, feed_dict={model.X: cut_list, model.keep_prob: 1.0})
         prediction_list = [num2str[num] for num in nums]
 
         # Write predictions into mappings.txt.
@@ -47,9 +45,9 @@ def test(output,sess):
         sys.stdout.flush()
 
 if __name__ == '__main__':
-    output, _ = captcha_cnn()
-    saver = tf.train.Saver()
+    model = Model()
+    saver = tf.train.Saver(tf.trainable_variables())
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     saver.restore(sess, conf.MODEL_PATH)
-    test(output,sess)
+    test(model,sess)

@@ -8,7 +8,7 @@ import numpy as np
 import conf
 
 # The number of images in the validation set.
-_NUM_VALID = 2000
+_NUM_VALID = 10000
 
 def _get_filenames_and_classes(dataset_dir):
     """ Get all classes and filenames. """
