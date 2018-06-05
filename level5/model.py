@@ -1,21 +1,30 @@
 import tensorflow as tf
 
-
 class Siamese(object):
     def __init__(self):
         with tf.name_scope("input"):
             self.left = tf.placeholder(tf.float32, [None, 40, 40, 1], name='left')
             self.right = tf.placeholder(tf.float32, [None, 40, 40, 1], name='right')
             self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-        with tf.name_scope("similarity"):
             label = tf.placeholder(tf.int32, [None, 1], name='label')  # 1 if same, 0 if different
             self.label = tf.to_float(label)
 
-        self.left_output = self.siamesenet(self.left, reuse=False)
-        self.right_output = self.siamesenet(self.right, reuse=True)
-        self.y_, self.loss = self.contrastive_loss(self.left_output,self.right_output,self.label)
+        self.left_output = self.model(self.left, reuse=False)
+        self.right_output = self.model(self.right, reuse=True)
+        self.prediction, self.loss = self.contrastive_loss(self.left_output, self.right_output, self.label)
+        tf.summary.scalar('loss', self.loss)
 
-    def siamesenet(self, input, reuse=False):
+        with tf.name_scope('correct_prediction'):
+            correct_prediction = tf.equal(tf.less(self.prediction, 0.5), tf.less(self.label, 0.5))
+        with tf.name_scope('AdamOptimizer'):
+            self.optimizer = tf.train.GradientDescentOptimizer(0.001).minimize(self.loss)
+        with tf.name_scope('accuracy'):
+            self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+            tf.summary.scalar('accuracy', self.accuracy)
+
+        self.merged = tf.summary.merge_all()
+
+    def model(self, input, reuse=False):
         with tf.name_scope("Siamese"):
             with tf.variable_scope("conv1") as scope:
                 net = tf.contrib.layers.conv2d(input, 32, [3, 3], activation_fn=tf.nn.relu, padding='SAME',
@@ -78,3 +87,8 @@ class Siamese(object):
             losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_,labels=y)
             loss = tf.reduce_mean(losses)
         return y_, loss
+
+
+if __name__ == '__main__':
+    model = Siamese()
+    print(model)

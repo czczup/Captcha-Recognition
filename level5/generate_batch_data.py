@@ -5,25 +5,33 @@ import tensorflow as tf
 from util import read_CSV
 import numpy as np
 import conf
-# sess = tf.InteractiveSession()
-num2idx = read_CSV("raw_mappings.txt")
+from multiprocessing import Process
+import time
 
-def get_positive_and_negative_batch():
-    for i in range(300000):
+num2idx = read_CSV(conf.TRAIN_MAPPINGS)
+
+def get_positive_and_negative_batch(number):
+    time1 = time.time()
+    for i in range(60000):
         image1, image2, label = get_positive_pair()
         image_1 = np.concatenate([image1, image2], axis=1)
-        save_path = conf.CUT_PATH+"/1/"+str(i)+".jpg"
+        save_path = conf.CUT_PATH+"/1/"+str(i)+"_"+str(number)+".jpg"
         cv2.imwrite(save_path, image_1)
+
         image1, image2, label = get_negative_pair()
         image_2 = np.concatenate([image1, image2], axis=1)
-        save_path = conf.CUT_PATH+"/0/"+str(i)+".jpg"
+        save_path = conf.CUT_PATH+"/0/"+str(i)+"_"+str(number)+".jpg"
         cv2.imwrite(save_path, image_2)
-        print("Cutting pictures:"+str(i+1)+"/"+str(300000))
+        print("Cutting pictures:"+str(i+1)+"/"+str(60000))
+    else:
+        time2 = time.time()
+        print(str(time2-time1)+"s")
+
 
 
 def get_positive_pair(): # 获取正样本对
-    num = np.random.randint(0,9500)
-    folder = str(num).zfill(4) # [0,9499]
+    num = np.random.randint(0,10000)
+    folder = str(num).zfill(4) # [0,9999]
     mode = np.random.randint(1,4) # [1,2,3]
     label = [1]
     if mode == 1: # 从XXXX.jpg中选择
@@ -54,11 +62,10 @@ def get_positive_pair(): # 获取正样本对
         return image1, image2, label
 
 def get_negative_pair(): # 获取负样本对
-    num = np.random.randint(0, 9500)
-    folder = str(num).zfill(4) # [0,9499]
-    # mode = np.random.randint(1,4) # [1,2,3]
+    num = np.random.randint(0, 10000)
+    folder = str(num).zfill(4) # [0,9999]
+    mode = np.random.randint(1,4) # [1,2,3]
     label = [0]
-    mode = 2
     if mode==1: # 从XXXX.jpg中选择
         path = conf.TRAIN_IMAGE_PATH+"/"+folder+"/"+folder+".jpg"
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
@@ -90,4 +97,13 @@ def get_negative_pair(): # 获取负样本对
         return image1, image2, label
 
 if __name__ == '__main__':
-    get_positive_and_negative_batch()
+    # p1 = Process(target=get_positive_and_negative_batch, args=(0,))
+    # p2 = Process(target=get_positive_and_negative_batch, args=(1,))
+    # p3 = Process(target=get_positive_and_negative_batch, args=(2,))
+    # p4 = Process(target=get_positive_and_negative_batch, args=(3,))
+    # p5 = Process(target=get_positive_and_negative_batch, args=(4,))
+    p6 = Process(target=get_positive_and_negative_batch, args=(5,))
+    p6.start()
+    # pool = [p1, p2, p3, p4, p5]
+    # for p in pool:
+    #     p.start()

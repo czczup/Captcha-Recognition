@@ -6,9 +6,10 @@ import sys
 from PIL import Image
 import numpy as np
 import conf
+import cv2
 
 # The number of images in the validation set.
-_NUM_VALID = 2000
+_NUM_VALID = 36000
 
 def _get_filenames_and_classes(dataset_dir):
     """ Get all classes and filenames. """
@@ -36,9 +37,10 @@ def int64_feature(values):
 def bytes_feature(values):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[values]))
 
-def image_to_tfexample(image_data,class_id):
+def image_to_tfexample(image_data1,image_data2,class_id):
     return tf.train.Example(features=tf.train.Features(feature={
-        'image':bytes_feature(image_data),
+        'image1':bytes_feature(image_data1),
+        'image2':bytes_feature(image_data2),
         'label':int64_feature(class_id),
     }))
 
@@ -57,15 +59,15 @@ def _convert_dataset(split_name,filenames,class_names_to_ids,dataset_dir):
             output_filename = os.path.join(dataset_dir,"image_%s.tfrecord" % split_name)
             tfrecord_writer = tf.python_io.TFRecordWriter(output_filename)
             for i in range(len(filenames)):
-                image_data = Image.open(filenames[i])
-                image_data = image_data.resize((28, 40))
-                image_data = np.array(image_data.convert('L'))
-                image_data = image_data.tobytes()
+                image = cv2.imread(filenames[i], cv2.IMREAD_GRAYSCALE)
+                image1, image2 = image[:, 0:45], image[:, 45:90]
+                image1 = image1.tobytes()
+                image2 = image2.tobytes()
                 class_name = os.path.basename(os.path.dirname(filenames[i]))
                 class_id = class_names_to_ids[class_name]
-                example = image_to_tfexample(image_data,class_id)
+                example = image_to_tfexample(image1, image2, class_id)
                 tfrecord_writer.write(example.SerializeToString())
-                sys.stdout.write('\r>> Converting image %d/%d' % (i+1,len(filenames)))
+                sys.stdout.write('\r>> Converting image %d/%d'%(i+1, len(filenames)))
                 sys.stdout.flush()
 
     sys.stdout.write('\n')
