@@ -37,7 +37,7 @@ def image_cut(sum,image,threshold=19600):
 
 def cut_batch(start,end):
     """ Batch processing. """
-    mappings = read_CSV("raw_mappings.txt")
+    mappings = read_CSV(conf.TRAIN_MAPPINGS)
     for i in range(start,end):
         name = str(i).zfill(4)
         image = cv2.imread(conf.DENOISE_PATH+"/"+name+".png")
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     p2 = Process(target=cut_batch, args=(2000,4000,))
     p3 = Process(target=cut_batch, args=(4000,6000,))
     p4 = Process(target=cut_batch, args=(6000,8000,))
-    p5 = Process(target=cut_batch, args=(8000,9500,))
+    p5 = Process(target=cut_batch, args=(8000,10000,))
     pool = [p1, p2, p3, p4, p5]
     for p in pool:
         p.start()

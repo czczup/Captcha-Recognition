@@ -12,5 +12,11 @@ TRAIN_IMAGE_PATH = "./image/train"
 TFRECORD_PATH = "./tfrecord"
 # path of labels.txt
 LABEL_PATH = "./tfrecord/labels.txt"
-# frequency of testing
-TEST_NUMBER = 5000 # 5000
+# number of testing
+TEST_NUMBER = 5000
+# path of train_mappings.txt
+TRAIN_MAPPINGS = "./mappings/train_mappings.txt"
+# path of test_mappings.txt
+TEST_MAPPINGS = "./mappings/test_mappings.txt"
+# path of mappings.txt
+MAPPINGS = "./mappings/mappings.txt"

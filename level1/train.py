@@ -37,13 +37,13 @@ def load_dataset():
     with tf.name_scope('input_train'):
         image_train, label_train = read_and_decode("tfrecord/image_train.tfrecord")
         image_batch_train, label_batch_train = tf.train.shuffle_batch(
-            [image_train, label_train], batch_size=128, capacity=50000, min_after_dequeue=10000
+            [image_train, label_train], batch_size=128, capacity=12800, min_after_dequeue=5120
         )
     # Load validation set.
     with tf.name_scope('input_valid'):
         image_valid, label_valid = read_and_decode("tfrecord/image_valid.tfrecord")
         image_batch_valid, label_batch_valid = tf.train.shuffle_batch(
-            [image_valid, label_valid], batch_size=5000, capacity=50000, min_after_dequeue=10000
+            [image_valid, label_valid], batch_size=256, capacity=12800, min_after_dequeue=5120
         )
     return image_batch_train, label_batch_train,image_batch_valid, label_batch_valid
 
