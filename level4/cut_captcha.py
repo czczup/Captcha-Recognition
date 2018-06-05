@@ -5,7 +5,7 @@ import conf
 
 def cut_batch(start,end):
     """ Cut captcha into 4 parts. """
-    num2idx = read_CSV("raw_mappings.txt")
+    num2idx = read_CSV(conf.TRAIN_MAPPINGS)
     for i in range(start,end):
         name = str(i).zfill(4)
         path = conf.TRAIN_IMAGE_PATH+"/"+name+".jpg"
