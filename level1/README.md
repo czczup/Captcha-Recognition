@@ -36,6 +36,7 @@
   - generate_tfrecord.py 生成tfrecord
   - model.py 模型定义
   - train.py 训练代码
+  - test.py 测试代码
   - util.py 包含一个csv读取函数
 - 文件夹
   - mappings 训练集标签/测试集标签/预测标签

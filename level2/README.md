@@ -1,10 +1,10 @@
-# 第一类验证码
+# 第二类验证码
 
 ## 问题介绍
 
-数字、英文，有噪点，无旋转形变。
+英文字母+数字验证码，包含 5 个字符，有噪点干扰，文字无旋转形变，验证方法为要求用户输出验证码中的字符，大小写不限（ 为验证方便可统一转为大写 ）。
 
-![第一类验证码](https://github.com/czczup/Captcha-Recognition/blob/master/docs/problem2.png?raw=true)
+![第二类验证码](https://github.com/czczup/Captcha-Recognition/blob/master/docs/problem2.png?raw=true)
 
 ## 问题分析
 
@@ -15,11 +15,11 @@
 
 ### 彩图
 
-![第一类验证码模型](https://github.com/czczup/Captcha-Recognition/blob/master/docs/net2.png?raw=true)
+![第二类验证码模型](https://github.com/czczup/Captcha-Recognition/blob/master/docs/net2.png?raw=true)
 
 ### 黑白图
 
-![第一类验证码模型](https://github.com/czczup/Captcha-Recognition/blob/master/docs/net2_.png?raw=true)
+![第二类验证码模型](https://github.com/czczup/Captcha-Recognition/blob/master/docs/net2_.png?raw=true)
 
 ### 介绍
 
@@ -35,6 +35,7 @@
   - generate_tfrecord.py 生成tfrecord
   - model.py 模型定义
   - train.py 训练代码
+  - test.py 测试代码
   - util.py 包含一个csv读取函数
 - 文件夹
   - mappings 训练集标签/测试集标签/预测标签
@@ -73,8 +74,6 @@
   ```
   python cut_captcha.py
   ```
-
-  用[**投影法**](https://blog.csdn.net/wx7788250/article/details/60139109)将验证码切成单字
 
 - **步骤四：生成TFRecord**
 
