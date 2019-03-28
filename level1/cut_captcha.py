@@ -14,7 +14,7 @@ def image_cut(sum, image, threshold=19600):
     width = 40
     cut_list = []
     for i in range(image.shape[1]):
-        if sum[i]<threshold and side1_available:
+        if sum[i] < threshold and side1_available:
             side1 = i
             side1_available = False
             continue
@@ -25,7 +25,7 @@ def image_cut(sum, image, threshold=19600):
             continue
         if not side1_available and not side2_available:
             distance = abs(side2-side1)
-            if np.sum(sum[side1:side2])/distance<20000:  # 切片平均累加灰度值
+            if np.sum(sum[side1:side2])/distance < 20000:  # 切片平均累加灰度值
                 if distance > width:
                     side1 += (distance-width)//2
                     side2 -= ((distance-width)-(distance-width)//2)
