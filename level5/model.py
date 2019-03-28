@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class Siamese(object):
     def __init__(self):
         with tf.name_scope("input"):
@@ -67,28 +68,28 @@ class Siamese(object):
             net = tf.concat([output1, output2, output3], 1)
 
             # add hidden layer1
-            hidden_Weights1 = tf.Variable(tf.truncated_normal([5632, 1024], stddev=0.1)) # 45-7040 40-5632
+            hidden_Weights1 = tf.Variable(tf.truncated_normal([5632, 1024], stddev=0.1))  # 45-7040 40-5632
             hidden_biases1 = tf.Variable(tf.constant(0.1, shape=[1024]))
-            net = tf.nn.relu(tf.matmul(net, hidden_Weights1) + hidden_biases1)
+            net = tf.nn.relu(tf.matmul(net, hidden_Weights1)+hidden_biases1)
             # add hidden layer2
-            hidden_Weights2 = tf.Variable(tf.truncated_normal([1024, 256], stddev=0.1)) # 128
+            hidden_Weights2 = tf.Variable(tf.truncated_normal([1024, 256], stddev=0.1))  # 128
             hidden_biases2 = tf.Variable(tf.constant(0.1, shape=[256]))
-            net = tf.nn.relu(tf.matmul(net, hidden_Weights2) + hidden_biases2)
+            net = tf.nn.relu(tf.matmul(net, hidden_Weights2)+hidden_biases2)
         return net
 
     def contrastive_loss(self, model1, model2, y):
         with tf.name_scope("output"):
-            output_difference = tf.abs(model1 - model2)
+            output_difference = tf.abs(model1-model2)
             W = tf.Variable(tf.random_normal([256, 1], stddev=0.1), name='W')
-            b = tf.Variable(tf.zeros([1, 1]) + 0.1, name='b')
-            y_ = tf.nn.sigmoid(tf.matmul(output_difference, W) + b, name='distance')
+            b = tf.Variable(tf.zeros([1, 1])+0.1, name='b')
+            y_ = tf.nn.sigmoid(tf.matmul(output_difference, W)+b, name='distance')
         # Calculate mean loss
         with tf.name_scope("loss"):
-            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_,labels=y)
+            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=y_, labels=y)
             loss = tf.reduce_mean(losses)
         return y_, loss
 
 
-if __name__ == '__main__':
+if __name__=='__main__':
     model = Siamese()
     print(model)

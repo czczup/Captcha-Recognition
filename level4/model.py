@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class Model(object):
     def __init__(self):
         with tf.name_scope('input'):
@@ -15,7 +16,8 @@ class Model(object):
                 correct_prediction = tf.equal(tf.argmax(self.prediction, 1), tf.argmax(label, 1))
             with tf.name_scope('loss'):
                 # self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=prediction, labels=label))
-                self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
+                self.loss = tf.reduce_mean(
+                    tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
                 tf.summary.scalar('loss', self.loss)
             with tf.name_scope('AdamOptimizer'):
                 self.optimizer = tf.train.AdamOptimizer(0.001).minimize(self.loss)
@@ -24,23 +26,22 @@ class Model(object):
                 tf.summary.scalar('accuracy', self.accuracy)
         self.merged = tf.summary.merge_all()
 
-
     def model(self):
-        with tf.name_scope('conv1'): # conv1: 36*36*32 pool: 18*18*32
+        with tf.name_scope('conv1'):  # conv1: 36*36*32 pool: 18*18*32
             conv1 = tf.contrib.layers.conv2d(self.X, 32, [5, 5], activation_fn=tf.nn.relu, padding='SAME',
                                              weights_initializer=tf.contrib.layers.xavier_initializer_conv2d())
             norm = tf.layers.batch_normalization(conv1)
             pool = tf.contrib.layers.max_pool2d(norm, [2, 2], padding='SAME')
-            dropout = tf.nn.dropout(pool,keep_prob=self.keep_prob)
+            dropout = tf.nn.dropout(pool, keep_prob=self.keep_prob)
 
-        with tf.name_scope('conv2'): # conv2: 18*18*32 pool: 9*9*32
+        with tf.name_scope('conv2'):  # conv2: 18*18*32 pool: 9*9*32
             conv2 = tf.contrib.layers.conv2d(dropout, 32, [3, 3], activation_fn=tf.nn.relu, padding='SAME',
                                              weights_initializer=tf.contrib.layers.xavier_initializer_conv2d())
             norm = tf.layers.batch_normalization(conv2)
             pool = tf.contrib.layers.max_pool2d(norm, [2, 2], padding='SAME')
             dropout = tf.nn.dropout(pool, keep_prob=self.keep_prob)
 
-        with tf.name_scope('conv3'): # conv3: 9*9*64 pool: 5*5*64
+        with tf.name_scope('conv3'):  # conv3: 9*9*64 pool: 5*5*64
             conv3 = tf.contrib.layers.conv2d(dropout, 64, [3, 3], activation_fn=tf.nn.relu, padding='SAME',
                                              weights_initializer=tf.contrib.layers.xavier_initializer_conv2d())
             norm = tf.layers.batch_normalization(conv3)
@@ -63,6 +64,7 @@ class Model(object):
 
         return output
 
-if __name__ == '__main__':
+
+if __name__=='__main__':
     model = Model()
     print(model)

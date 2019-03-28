@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class Model(object):
     def __init__(self):
         with tf.name_scope('input'):
@@ -14,7 +15,8 @@ class Model(object):
             with tf.name_scope('correct_prediction'):
                 correct_prediction = tf.equal(tf.argmax(self.prediction, 1), tf.argmax(label, 1))
             with tf.name_scope('loss'):
-                self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
+                self.loss = tf.reduce_mean(
+                    tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
                 tf.summary.scalar('loss', self.loss)
             with tf.name_scope('AdamOptimizer'):
                 self.optimizer = tf.train.GradientDescentOptimizer(0.0001).minimize(self.loss)
@@ -74,7 +76,6 @@ class Model(object):
 
         return wx_plus_b_fc2, [w_c1, b_c1, w_c2, b_c2, w_c3, b_c3, w_c4, b_c4]
 
-if __name__ == '__main__':
+
+if __name__=='__main__':
     model = Model()
-
-

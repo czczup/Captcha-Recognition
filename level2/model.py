@@ -1,20 +1,22 @@
 import tensorflow as tf
 
+
 class Model(object):
     def __init__(self):
         with tf.name_scope('input'):
-            self.X = tf.placeholder(tf.float32, [None, 44,60,1], name='X')
+            self.X = tf.placeholder(tf.float32, [None, 44, 60, 1], name='X')
             self.Y = tf.placeholder(tf.float32, [None], name='Y')
             label = tf.one_hot(indices=tf.cast(self.Y, tf.int32), depth=32, name='y_onehot')
             self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
-        self.prediction, self.parameters = self.model()
+        self.prediction = self.model()
 
         with tf.name_scope('output'):
             with tf.name_scope('correct_prediction'):
                 correct_prediction = tf.equal(tf.argmax(self.prediction, 1), tf.argmax(label, 1))
             with tf.name_scope('loss'):
-                self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
+                self.loss = tf.reduce_mean(
+                    tf.nn.softmax_cross_entropy_with_logits(logits=self.prediction, labels=label))
                 tf.summary.scalar('loss', self.loss)
             with tf.name_scope('AdamOptimizer'):
                 self.optimizer = tf.train.GradientDescentOptimizer(0.001).minimize(self.loss)
@@ -72,9 +74,8 @@ class Model(object):
             b_fc2 = tf.Variable(b_alpha*tf.random_normal([32]), name='b_fc2')
             wx_plus_b_fc2 = tf.add(tf.matmul(drop_fc1, w_fc2), b_fc2, name='wx_plus_b')
 
-        return wx_plus_b_fc2, [w_c1, b_c1, w_c2, b_c2, w_c3, b_c3, w_c4, b_c4]
+        return wx_plus_b_fc2
 
-if __name__ == '__main__':
+
+if __name__=='__main__':
     model = Model()
-
-

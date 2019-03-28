@@ -4,11 +4,12 @@ import numpy as np
 import tensorflow as tf
 import conf
 import cut_captcha
-from model import x,keep_prob,captcha_nn
+from model import x, keep_prob, captcha_nn
 import denoise_opencv
 
 num2str = {0: "0", 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
-           7:"7", 8:"8", 9:"9", 10:"*", 11:"+", 12:"-"}
+           7: "7", 8: "8", 9: "9", 10: "*", 11: "+", 12: "-"}
+
 
 def open_image(i):
     """ Open a RGB image and return a GRAY image. """
@@ -28,11 +29,13 @@ def open_image(i):
 
     return image_binary
 
+
 def cut(image):
     """ Find the characters and cut them into a list. """
     horizontal_sum = np.sum(image, axis=0)
-    cut_list = cut_captcha.image_cut(horizontal_sum,image)
+    cut_list = cut_captcha.image_cut(horizontal_sum, image)
     return cut_list
+
 
 def test():
     # Network
@@ -45,19 +48,19 @@ def test():
     sess.run(tf.global_variables_initializer())
 
     # Restore the model.
-    saver.restore(sess,conf.MODEL_PATH)
+    saver.restore(sess, conf.MODEL_PATH)
 
     f = open(conf.MAPPINGS, "w")
 
     for i in range(conf.TEST_NUMBER):
         # Open images
-        image_binary = open_image(i) # Get a gray image.
-        image_list = cut(image_binary) # cut
+        image_binary = open_image(i)  # Get a gray image.
+        image_list = cut(image_binary)  # cut
 
         # Get predictions
         expression = []
         for image in image_list:
-            image = np.reshape(image,[-1,2000]) / 255.0
+            image = np.reshape(image, [-1, 2000])/255.0
             key = sess.run(result, feed_dict={x: image, keep_prob: 1.0})[0]
             expression.append(num2str[key])
 
@@ -68,8 +71,9 @@ def test():
         f.write(predict_result)
         f.write("="+str(eval(predict_result))+"\n")
 
-        sys.stdout.write('\r>> Testing image %d/%d' % (i+1, conf.TEST_NUMBER))
+        sys.stdout.write('\r>> Testing image %d/%d'%(i+1, conf.TEST_NUMBER))
         sys.stdout.flush()
 
-if __name__ == '__main__':
+
+if __name__=='__main__':
     test()

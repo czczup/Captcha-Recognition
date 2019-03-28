@@ -1,21 +1,23 @@
 import tensorflow as tf
-from model import lr,x,y,Y,keep_prob,captcha_nn
+from model import lr, x, y, Y, keep_prob, captcha_nn
 import conf
 
+
 def read_and_decode(filename):
-    filename_queue = tf.train.string_input_producer([filename]) # create a queue
+    filename_queue = tf.train.string_input_producer([filename])  # create a queue
     reader = tf.TFRecordReader()
-    _, serialized_example = reader.read(filename_queue) # return file_name and file
+    _, serialized_example = reader.read(filename_queue)  # return file_name and file
     features = tf.parse_single_example(serialized_example,
                                        features={
-                                           'image':tf.FixedLenFeature([],tf.string),
-                                           'label':tf.FixedLenFeature([],tf.int64),
-                                       }) # return image and label
-    image = tf.decode_raw(features['image'],tf.uint8)
-    image = tf.reshape(image,[2000]) # reshape image to 40*50
-    image = tf.cast(image, tf.float32) / 255.0
-    label = tf.cast(features['label'],tf.int64) # throw label tensor
+                                           'image': tf.FixedLenFeature([], tf.string),
+                                           'label': tf.FixedLenFeature([], tf.int64),
+                                       })  # return image and label
+    image = tf.decode_raw(features['image'], tf.uint8)
+    image = tf.reshape(image, [2000])  # reshape image to 40*50
+    image = tf.cast(image, tf.float32)/255.0
+    label = tf.cast(features['label'], tf.int64)  # throw label tensor
     return image, label
+
 
 def network():
     prediction = captcha_nn()
@@ -32,6 +34,7 @@ def network():
     merged = tf.summary.merge_all()
     return loss, optimizer, accuracy, merged
 
+
 def load_dataset():
     # Load training set.
     with tf.name_scope('input_train'):
@@ -45,7 +48,8 @@ def load_dataset():
         image_batch_valid, label_batch_valid = tf.train.shuffle_batch(
             [image_valid, label_valid], batch_size=256, capacity=12800, min_after_dequeue=5120
         )
-    return image_batch_train, label_batch_train,image_batch_valid, label_batch_valid
+    return image_batch_train, label_batch_train, image_batch_valid, label_batch_valid
+
 
 def train():
     # Network
@@ -67,7 +71,7 @@ def train():
 
     for i in range(300):
         # Learning rate delay.
-        if i%40==0:
+        if i % 40 == 0:
             sess.run(tf.assign(lr, 0.001*(0.95**(i//40))))
 
         # Get a batch of data.
@@ -89,12 +93,13 @@ def train():
         print("Lter "+str(i)+",Train Accuracy "+str(train_acc)+",Valid Accuracy "+str(valid_acc))
 
         # Save the model.
-        if valid_acc==1.00:
+        if valid_acc == 1.00:
             print("Save the model Successfully")
             saver.save(sess, "model/model_level1.ckpt", global_step=i)
 
     coord.request_stop()
     coord.join(threads)
 
-if __name__ == '__main__':
+
+if __name__=='__main__':
     train()

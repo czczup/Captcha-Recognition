@@ -9,6 +9,7 @@ with tf.name_scope('input'):
     y = tf.placeholder(tf.float32, [None], name='y_input')
     Y = tf.one_hot(indices=tf.cast(y, tf.int32), depth=13, name='y_onehot')
 
+
 def captcha_nn():
     """ The network of level1. """
     with tf.name_scope('L1'):

@@ -1,4 +1,4 @@
-# path of model
+ # path of model
 MODEL_PATH = "./model/model_level5.ckpt-9000"
 # path of test images
 TEST_IMAGE_PATH = './image/test'
