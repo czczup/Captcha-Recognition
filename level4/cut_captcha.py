@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from util import read_CSV
 import conf
-
+import os
 
 def cut_batch(start, end):
     """ Cut captcha into 4 parts. """
@@ -26,4 +26,8 @@ def cut_batch(start, end):
 
 
 if __name__=='__main__':
+    if not os.path.exists(conf.CUT_PATH+"/0/"):
+        os.makedirs(conf.CUT_PATH+"/0/")
+    if not os.path.exists(conf.CUT_PATH+"/1/"):
+        os.makedirs(conf.CUT_PATH+"/1/")
     cut_batch(0, 9500)

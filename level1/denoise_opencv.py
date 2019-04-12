@@ -3,6 +3,7 @@ import sys
 from multiprocessing import Process
 import cv2
 import conf
+import os
 
 
 def get_threshold(image, x=26, y=64):
@@ -127,6 +128,8 @@ def remove_noise(num):
 
 def remove_batch(start, end):
     """ Batch processing. """
+    if not os.path.exists(conf.DENOISE_PATH):
+        os.makedirs(conf.DENOISE_PATH)
     for i in range(start, end):
         remove_noise(i)
         print("Dealing pictures:"+str(i)+"/"+str(end-1))

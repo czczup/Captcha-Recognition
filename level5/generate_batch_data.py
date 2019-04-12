@@ -1,4 +1,3 @@
-import conf
 import random
 import cv2
 import tensorflow as tf
@@ -7,6 +6,7 @@ import numpy as np
 import conf
 from multiprocessing import Process
 import time
+import os
 
 num2idx = read_CSV(conf.TRAIN_MAPPINGS)
 
@@ -27,7 +27,10 @@ def get_positive_and_negative_batch(number):
     else:
         time2 = time.time()
         print(str(time2-time1)+"s")
-
+    if not os.path.exists(conf.CUT_PATH+"/0/"):
+        os.makedirs(conf.CUT_PATH+"/0/")
+    if not os.path.exists(conf.CUT_PATH+"/1/"):
+        os.makedirs(conf.CUT_PATH+"/1/")
 
 def get_positive_pair():  # 获取正样本对
     num = np.random.randint(0, 10000)
@@ -99,6 +102,10 @@ def get_negative_pair():  # 获取负样本对
 
 
 if __name__ == '__main__':
+    if not os.path.exists(conf.CUT_PATH+"/0/"):
+        os.makedirs(conf.CUT_PATH+"/0/")
+    if not os.path.exists(conf.CUT_PATH+"/1/"):
+        os.makedirs(conf.CUT_PATH+"/1/")
     p1 = Process(target=get_positive_and_negative_batch, args=(0,))
     p2 = Process(target=get_positive_and_negative_batch, args=(1,))
     p3 = Process(target=get_positive_and_negative_batch, args=(2,))

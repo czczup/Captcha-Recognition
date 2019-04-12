@@ -59,41 +59,34 @@
   - 训练集：image/train
   - 测试集：image/test
 
-- **步骤二：去噪二值化**
-
-  ```
-  python denoise_opencv.py
-  ```
-
-  去噪后结果如图：
-
-  ![去噪](https://github.com/czczup/Captcha-Recognition/blob/master/docs/denoise2.png?raw=true)
-
-- **步骤三：切割**
+- **步骤二：去噪并切割**
 
   ```
   python cut_captcha.py
   ```
+去噪后结果如图：
 
-- **步骤四：生成TFRecord**
+  ![去噪](https://github.com/czczup/Captcha-Recognition/blob/master/docs/denoise2.png?raw=true)
+
+- **步骤三：生成TFRecord**
 
   ```
   python generate_tfrecord.py
   ```
 
-- **步骤五：训练**
+- **步骤四：训练**
 
   ```
   python train.py
   ```
 
-- **步骤六：测试**
+- **步骤五：测试**
 
   ```
   python test.py
   ```
 
-- **步骤七：计算准确率**
+- **步骤六：计算准确率**
 
   ```
   python accuracy_calculate.py

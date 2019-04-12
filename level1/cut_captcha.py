@@ -3,6 +3,7 @@ import numpy as np
 import conf
 from util import read_CSV
 from multiprocessing import Process
+import os
 
 name_dic = {"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6", "7": "7",
             "8": "8", "9": "9", "0": "0", "+": "plus", "-": "sub", "*": "mul"}
@@ -46,7 +47,10 @@ def cut_batch(start, end):
         horizontal_sum = np.sum(image, axis=0)
         sum = [item[0] for item in horizontal_sum]
         cut_list = image_cut(sum, image)
+
         for j in range(len(cut_list)):
+            if not os.path.exists(conf.CUT_PATH+"/"+name_dic[mappings[i][j]]+"/"):
+                os.makedirs(conf.CUT_PATH+"/"+name_dic[mappings[i][j]]+"/")
             path = conf.CUT_PATH+"/"+name_dic[mappings[i][j]]+"/"+name+"_"+str(j)+".png"
             cv2.imwrite(path, cut_list[j])
         print("Cutting pictures:"+str(i)+"/"+str(end-1))

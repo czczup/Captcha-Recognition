@@ -3,7 +3,7 @@ import denoise_opencv
 from multiprocessing import Process
 from util import read_CSV
 import conf
-
+import os
 
 def cut_batch(start, end):
     num2char = read_CSV(conf.TRAIN_MAPPINGS)
@@ -14,6 +14,8 @@ def cut_batch(start, end):
         cnt = 0
         cut_list = [image[:, 2:46], image[:, 37:81], image[:, 77:121], image[:, 117:161], image[:, 154:198]]
         for j in range(len(cut_list)):
+            if not os.path.exists(conf.CUT_PATH+"/"+num2char[i][j]+"/"):
+                os.makedirs(conf.CUT_PATH+"/"+num2char[i][j]+"/")
             path = conf.CUT_PATH+"/"+num2char[i][j]+"/"+name+"_"+str(j)+"_"+str(cnt)+".png"
             image = denoise_opencv.remove_noise(cut_list[j])
             cv2.imwrite(path, image)
